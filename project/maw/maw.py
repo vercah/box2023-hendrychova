@@ -1,29 +1,8 @@
 import sys
 from xopen import xopen
-from functools import lru_cache
 from readfa import readfq
 
-NUCLEOTIDE_COMPLEMENT = {
-    'A': 'T',
-    'T': 'A',
-    'C': 'G',
-    'G': 'C'
-}
 
-def reverse_complement(seq: str) -> str:
-    rev = []
-    for char in reversed(seq):
-        rev.append(NUCLEOTIDE_COMPLEMENT[char])
-    return "".join(rev)
-
-def to_canonical(seq: str) -> str:
-    rev = reverse_complement(seq)
-    if rev < seq:
-        return rev
-    else:
-        return seq
-
-@lru_cache
 def read_fa_sequences(file_name: str) -> dict[str, str]:
     sequences = dict()
     for seq_name, seq, _ in readfq(xopen(file_name)):
