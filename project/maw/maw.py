@@ -16,6 +16,13 @@ def reverse_complement(seq: str) -> str:
         rev.append(NUCLEOTIDE_COMPLEMENT[char])
     return "".join(rev)
 
+def to_canonical(seq: str) -> str:
+    rev = reverse_complement(seq)
+    if rev < seq:
+        return rev
+    else:
+        return seq
+
 @lru_cache
 def read_fa_sequences(file_name: str) -> dict[str, str]:
     sequences = dict()
