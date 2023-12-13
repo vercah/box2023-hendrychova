@@ -30,6 +30,8 @@ def extended_strings(seq: str) -> set[str]:
 def k_maws_of_sequence(seq: str, k: int) -> set[str]:
     """Returns all canonical minimum absent words of length k of
     sequence seq."""
+    # TODO: doesn't work because it only ensures that substrings
+    # of length k-1 are present, and not all from 3 to k-1.
     maws = set()
     for w in k_substrings(seq, k-1):
         for x in extended_strings(w):
