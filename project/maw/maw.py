@@ -10,14 +10,14 @@ NUCLEOTIDE_COMPLEMENT = {
     'G': 'C'
 }
 
-def reverse_complement(seq: str):
+def reverse_complement(seq: str) -> str:
     rev = []
     for char in reversed(seq):
         rev.append(NUCLEOTIDE_COMPLEMENT[char])
     return "".join(rev)
 
 @lru_cache
-def read_fa_sequences(file_name: str):
+def read_fa_sequences(file_name: str) -> dict[str, str]:
     sequences = dict()
     for seq_name, seq, _ in readfq(xopen(file_name)):
         if seq_name in sequences:
