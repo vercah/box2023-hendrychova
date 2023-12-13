@@ -1,3 +1,4 @@
+import sys
 from xopen import xopen
 from functools import lru_cache
 from readfa import readfq
@@ -26,7 +27,7 @@ def read_fa_sequences(file_name: str):
 
 
 def main():
-    sequences = read_fa_sequences("../all_ebi_plasmids.fa.xz")
+    sequences = read_fa_sequences(sys.argv[1])
     for name, seq in sequences.items():
         print(name, len(seq))
 
