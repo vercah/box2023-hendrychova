@@ -27,10 +27,10 @@ def add_reverse_complements(seqs: set[str]) -> set[str]:
 
 
 def get_proper_prefixes(seq: str) -> set[str]:
-    return set(seq[:i] for i in range(len(seq)-1))
+    return set(seq[:i] for i in range(1,len(seq)))
 
 def get_proper_suffixes(seq: str) -> set[str]:
-    return set(seq[i:] for i in range(len(seq)-1))
+    return set(seq[i:] for i in range(1, len(seq)))
 
 def extended_strings(seq: str) -> set[str]:
     """Returns all possible strings of length |seq|+1 that have seq
