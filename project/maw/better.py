@@ -1,4 +1,4 @@
-from utils import ALPHABET, to_canonical, reverse_complement
+from maw.utils import ALPHABET, to_canonical, reverse_complement
 from typing import Collection
 from functools import lru_cache
 
@@ -6,7 +6,7 @@ from functools import lru_cache
 def k_substrings(seq: str, k: int) -> set[str]:
     """Returns the substrings of length k in the given sequence."""
     subs = set()
-    for i in range(len(seq)-k):
+    for i in range(len(seq)-k+1):
         subs.add(seq[i:i+k])
     return subs
 
@@ -42,8 +42,7 @@ def extended_strings(seq: str) -> set[str]:
     return exts
 
 def k_maws_candidates_of_sequence(seq: str, k: int) -> set[str]:
-    """Returns all canonical minimum absent words of length k of
-    sequence seq."""
+    """Returns all possible absent words candidates of length 3 up to k"""
     candidates = set()
     for w in add_reverse_complements(all_substrings(seq, 3, k-1)):
         candidates.update(extended_strings(w))
