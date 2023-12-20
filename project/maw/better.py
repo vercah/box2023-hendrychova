@@ -41,20 +41,17 @@ def extended_strings(seq: str) -> set[str]:
         exts.add(seq + a)
     return exts
 
-def k_maws_candidates_of_sequence(seq: str, k: int) -> set[str]:
+def all_maws_candidates_of_sequence(seq: str, k: int) -> set[str]:
     """Returns all possible absent words candidates of length 3 up to k"""
     candidates = set()
-    for w in add_reverse_complements(all_substrings(seq, 3, k-1)):
+    for w in add_reverse_complements(all_substrings(seq, 2, k-1)):
         candidates.update(extended_strings(w))
     return candidates
 
-def k_maws(sequences: Collection[str], k: int):
-    """Returns all minimum absent words (MAWs) of length k of the set
-    of sequences.
-    """
+def maws(sequences: Collection[str], k: int):
     maws = set()
     for seq in sequences:
-        for x in k_maws_candidates_of_sequence(seq, k):
+        for x in all_maws_candidates_of_sequence(seq, k):
             rx = reverse_complement(x)
             pres = get_proper_prefixes(x)
             sufs = get_proper_suffixes(x)
@@ -71,16 +68,4 @@ def k_maws(sequences: Collection[str], k: int):
                     valide_candiate = False
             if valide_candiate:
                 maws.add(to_canonical(x))
-    return maws
-
-def maws(sequences: Collection[str], kmax: int) -> dict[int, set[str]]:
-    """Returns all minimum absent words (MAWs) of length 3 to kmax of the set
-    of sequences. Each set of MAWs contains only the canonical strings.
-    
-    Returns: a dictionary `maws` such that `maws[k]` is the set of MAWs
-    of length k in the set of sequences.
-    """
-    maws = {k: set() for k in range(3, kmax+1)}
-    for k in maws.keys():
-        maws[k] = k_maws(sequences, k)
     return maws
