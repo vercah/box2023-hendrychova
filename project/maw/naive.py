@@ -3,7 +3,6 @@ from typing import Collection
 from functools import lru_cache
 
 
-@lru_cache
 def k_substrings(seq: str, k: int) -> set[str]:
     """Returns the substrings of length k in the given sequence."""
     subs = set()
@@ -18,6 +17,21 @@ def all_substrings(seq: str, mini: int, maxi: int) -> set[str]:
         subs.update(k_substrings(seq, k))
     return subs
 
+def add_reverse_complements(seqs: set[str]) -> set[str]:
+    """Adds to a given set of strings with their reverse complements."""
+    new_seqs = set()
+    for seq in seqs:
+        new_seqs.add(seq)
+        new_seqs.add(reverse_complement(seq))
+    return new_seqs
+
+
+def get_proper_prefixes(seq: str) -> set[str]:
+    return set(seq[:i] for i in range(len(seq)-1))
+
+def get_proper_suffixes(seq: str) -> set[str]:
+    return set(seq[i:] for i in range(len(seq)-1))
+
 def extended_strings(seq: str) -> set[str]:
     """Returns all possible strings of length |seq|+1 that have seq
     as a substring."""
@@ -27,31 +41,47 @@ def extended_strings(seq: str) -> set[str]:
         exts.add(seq + a)
     return exts
 
-def k_maws_of_sequence(seq: str, k: int) -> set[str]:
+def k_maws_candidates_of_sequence(seq: str, k: int) -> set[str]:
     """Returns all canonical minimum absent words of length k of
     sequence seq."""
-    # TODO: doesn't work because it only ensures that substrings
-    # of length k-1 are present, and not all from 3 to k-1.
+    candidates = set()
+    for w in add_reverse_complements(all_substrings(seq, 3, k-1)):
+        candidates.update(extended_strings(w))
+    return candidates
+
+def k_maws(sequences: Collection[str], k: int):
+    """Returns all minimum absent words (MAWs) of length k of the set
+    of sequences.
+    """
     maws = set()
-    for w in k_substrings(seq, k-1):
-        for x in extended_strings(w):
+    for seq in sequences:
+        for x in k_maws_candidates_of_sequence(seq, k):
             rx = reverse_complement(x)
-            if x not in seq and rx not in seq:
+            pres = get_proper_prefixes(x)
+            sufs = get_proper_suffixes(x)
+            subs = pres.union(sufs)
+            valide_candiate = True
+            for sub in subs:
+                for other_seq in sequences:
+                    if sub not in other_seq:
+                        valide_candiate = False
+            if not valide_candiate:
+                continue
+            for other_seq in sequences:
+                if x in other_seq or rx in other_seq:
+                    valide_candiate = False
+            if valide_candiate:
                 maws.add(to_canonical(x))
     return maws
 
-def maws(sequences: Collection[str], kmax: int) -> dict[int, list[str]]:
+def maws(sequences: Collection[str], kmax: int) -> dict[int, set[str]]:
     """Returns all minimum absent words (MAWs) of length 3 to kmax of the set
-    of sequences. Each list of MAWs is ordered alphabetically and only
-    contains canonical words.
+    of sequences. Each set of MAWs contains only the canonical strings.
     
-    Returns: a dictionary `maws` such that `maws[k]` is the ordered list of
-    MAWs of length k.
+    Returns: a dictionary `maws` such that `maws[k]` is the set of MAWs
+    of length k in the set of sequences.
     """
-    maws = {k: [] for k in range(3, kmax+1)}
-    for seq in sequences:
-        for k in maws.keys():
-            maws[k].extend(k_maws_of_sequence(seq, k))
-    for k, lst in maws.items():
-        maws[k] = sorted(lst)
+    maws = {k: set() for k in range(3, kmax+1)}
+    for k in maws.keys():
+        maws[k] = k_maws(sequences, k)
     return maws
