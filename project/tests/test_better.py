@@ -5,22 +5,19 @@ from maw.better import add_reverse_complements
 from maw.better import get_proper_prefixes
 from maw.better import get_proper_suffixes
 from maw.better import extended_strings
+from maw.better import all_maws_candidates
+from maw.better import get_all_maws
 
 def test_k_substrings():
     assert k_substrings("AACTGG", 2) == {"AA", "AC", "CT", "TG", "GG"}
     assert k_substrings("AACTGG", 3) == {"AAC", "ACT", "CTG", "TGG"}
 
 def test_all_substrings():
-    assert all_substrings("AACTGG", 2, 3) == {"AA", "AC", "CT", "TG", "GG",
-                                             "AAC", "ACT", "CTG", "TGG"}
-    assert all_substrings("ACCTG", 3, 5) == {"ACC", "CCT", "CTG", "ACCT", "CCTG",
-                                             "ACCTG"}
+    assert all_substrings("AACTGG", 2, 3) == {"AA", "AC", "CT", "TG", "GG", "AAC", "ACT", "CTG", "TGG"}
+    assert all_substrings("ACCTG", 3, 5) == {"ACC", "CCT", "CTG", "ACCT", "CCTG", "ACCTG"}
 
 def test_add_reverse_complements():
-    assert add_reverse_complements({"AA", "AC", "CT", "TG", "GG", "AAC", 
-                                    "ACT", "CTG", "TGG"}) == {"AA", "AC", "CT", "TG", "GG", "AAC", 
-                                    "ACT", "CTG", "TGG", "TT", "GT", "AG", "CA", "CC", "GTT", 
-                                    "AGT", "CAG", "CCA"}
+    assert add_reverse_complements({"AA", "AC", "CT", "TG", "GG", "AAC", "ACT", "CTG", "TGG"}) == {"AA", "AC", "CT", "TG", "GG", "AAC", "ACT", "CTG", "TGG", "TT", "GT", "AG", "CA", "CC", "GTT", "AGT", "CAG", "CCA"}
     
 def test_get_proper_prefixes():
     assert get_proper_prefixes("CGAACT") == {"C", "CG", "CGA", "CGAA", "CGAAC"}
@@ -31,5 +28,10 @@ def test_get_proper_suffixes():
     assert get_proper_suffixes("GTCCAT") == {"T", "AT", "CAT", "CCAT", "TCCAT"}
 
 def test_extended_strings():
-    assert extended_strings("TGAC") == {"ATGAC", "CTGAC", "GTGAC", "TTGAC", "TGACA",
-                                        "TGACC", "TGACG", "TGACT"}
+    assert extended_strings("TGAC") == {"ATGAC", "CTGAC", "GTGAC", "TTGAC", "TGACA", "TGACC", "TGACG", "TGACT"}
+
+def test_all_maws_candidates():
+    assert all_maws_candidates("TAA", 3) == {"ATA", "CTA", "GTA", "TTA", "TAA", "TAC", "TAG", "TAT", "AAA", "CAA", "GAA", "TAA", "AAA", "AAC", "AAG", "AAT", "TAT", "TAG", "TAC", "TAA", "TTA", "GTA", "CTA", "ATA", "TTT", "TTG", "TTC", "TTA", "TTT", "GTT", "CTT", "ATT"}
+
+def test_get_all_maws():
+    assert get_all_maws({"AACTACT"}, 3) == {"AAA", "TAA", "AAG"}

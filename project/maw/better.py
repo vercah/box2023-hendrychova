@@ -46,6 +46,8 @@ def all_maws_candidates(seq: str, k: int) -> set[str]:
     return candidates
 
 def get_all_maws(sequences: set[str], kmax: int) -> set[str]:
+    # TODO: found a counter example for which it doesn't work,
+    # look into tests
     maws = set()
     for seq in sequences:
         for x in all_maws_candidates(seq, kmax):
