@@ -1,7 +1,7 @@
 import sys
 from xopen import xopen
-from readfa import readfq
-from better import find_maws
+from maw.readfa import readfq
+from maw.better import find_maws
 
 def read_fa_sequences(file_name: str) -> dict[str, str]:
     sequences = dict()
