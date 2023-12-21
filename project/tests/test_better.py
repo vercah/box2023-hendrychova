@@ -4,9 +4,10 @@ from maw.better import all_substrings
 from maw.better import add_reverse_complements
 from maw.better import get_proper_prefixes
 from maw.better import get_proper_suffixes
-from maw.better import extended_strings
-from maw.better import all_maws_candidates
+from maw.better import extended_right
+from maw.better import extended_left
 from maw.better import get_all_maws
+from maw.better import left_maw_candidates
 
 def test_k_substrings():
     assert k_substrings("AACTGG", 2) == {"AA", "AC", "CT", "TG", "GG"}
@@ -27,11 +28,15 @@ def test_get_proper_suffixes():
     assert get_proper_suffixes("AGGCTA") == {"A", "TA", "CTA", "GCTA", "GGCTA"}
     assert get_proper_suffixes("GTCCAT") == {"T", "AT", "CAT", "CCAT", "TCCAT"}
 
-def test_extended_strings():
-    assert extended_strings("TGAC") == {"ATGAC", "CTGAC", "GTGAC", "TTGAC", "TGACA", "TGACC", "TGACG", "TGACT"}
+def test_extended_left():
+    assert extended_left("TGAC") == {"ATGAC", "CTGAC", "GTGAC", "TTGAC"}
 
-def test_all_maws_candidates():
-    assert all_maws_candidates("TAA", 3) == {"ATA", "CTA", "GTA", "TTA", "TAA", "TAC", "TAG", "TAT", "AAA", "CAA", "GAA", "TAA", "AAA", "AAC", "AAG", "AAT", "TAT", "TAG", "TAC", "TAA", "TTA", "GTA", "CTA", "ATA", "TTT", "TTG", "TTC", "TTA", "TTT", "GTT", "CTT", "ATT"}
+def test_extended_right():
+    assert extended_right("TGAC") == {"TGACA", "TGACC", "TGACG", "TGACT"}
+
+def test_left_maw_candidates():
+    assert left_maw_candidates("AAC",3) == {"AAA", "CAA", "GAA", "TAA", "AAC", "CAC", "GAC", "TAC", "ATT", "CTT", "GTT", "TTT", "AGT", "CGT", "GGT", "TGT"}
 
 def test_get_all_maws():
     assert get_all_maws({"AACTACT"}, 3) == {"AAA", "TAA", "AAG"}
+    assert get_all_maws({"AAA"}, 3) == set()

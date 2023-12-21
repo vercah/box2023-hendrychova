@@ -29,41 +29,58 @@ def get_proper_prefixes(seq: str) -> set[str]:
 def get_proper_suffixes(seq: str) -> set[str]:
     return set(seq[i:] for i in range(1, len(seq)))
 
-def extended_strings(seq: str) -> set[str]:
+def extended_left(seq: str) -> set[str]:
     """Returns all possible strings of length |seq|+1 that have seq
-    as a substring."""
+    as a suffix."""
     exts = set()
     for a in ALPHABET:
         exts.add(a + seq)
+    return exts
+
+def extended_right(seq: str) -> set[str]:
+    """Returns all possible strings of length |seq|+1 that have seq
+    as a prefix."""
+    exts = set()
+    for a in ALPHABET:
         exts.add(seq + a)
     return exts
 
-def all_maws_candidates(seq: str, k: int) -> set[str]:
-    """Returns all possible absent words candidates of length 3 up to k"""
+def left_maw_candidates(seq: str, k: int) -> set[str]:
+    """Returns all possible absent words candidates of length 3 up to k that were created as a left extension"""
     candidates = set()
     for w in add_reverse_complements(all_substrings(seq, 2, k-1)):
-        candidates.update(extended_strings(w))
+        candidates.update(extended_left(w))
+    return candidates
+
+def right_maw_candidates(seq: str, k: int) -> set[str]:
+    """Returns all possible absent words candidates of length 3 up to k that were created as a right extension"""
+    candidates = set()
+    for w in add_reverse_complements(all_substrings(seq, 2, k-1)):
+        candidates.update(extended_right(w))
     return candidates
 
 def get_all_maws(sequences: set[str], kmax: int) -> set[str]:
-    # TODO: found a counter example for which it doesn't work,
-    # look into tests
     maws = set()
+    pres = set()
+    sufs = set()
     for seq in sequences:
-        for x in all_maws_candidates(seq, kmax):
-            rx = reverse_complement(x)
-            pres = get_proper_prefixes(x)
-            sufs = get_proper_suffixes(x)
-            subs = pres.union(sufs)
+        left_candidates = left_maw_candidates(seq, kmax)
+        right_candidates = right_maw_candidates(seq, kmax)
+        all_candidates = left_candidates.union(right_candidates)
+        for x in all_candidates:
+            if x in left_candidates:
+                subs = get_proper_prefixes(x)
+            if x in right_candidates:
+                subs = get_proper_suffixes(x)
             valide_candiate = True
             for sub in subs:
                 for other_seq in sequences:
-                    if sub not in other_seq:
+                    if sub not in other_seq and reverse_complement(sub) not in other_seq:
                         valide_candiate = False
             if not valide_candiate:
                 continue
             for other_seq in sequences:
-                if x in other_seq or rx in other_seq:
+                if x in other_seq or reverse_complement(x) in other_seq:
                     valide_candiate = False
             if valide_candiate:
                 maws.add(to_canonical(x))
