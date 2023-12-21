@@ -1,7 +1,7 @@
 from maw.utils import reverse_complement, to_canonical
 from maw.utils import ALPHABET
 
-def is_maw(x: str, sequences: set[str]):
+def is_maw(x: str, sequences: set[str]) -> bool:
     """Tests if a given word x is a minimmal absent word of the given
     sequences. Mostly for testing purposes.
     """
@@ -20,7 +20,7 @@ def is_maw(x: str, sequences: set[str]):
     # reverse complement is a substring of at least one of
     # the sequences
     for wl in range(1, len(x)): # |w| = 1..|x|-1
-        for wi in range(0, len(x)-wl): # start index of w
+        for wi in range(0, len(x)-wl+1): # start index of w
             w = x[wi:wi+wl]
             rw = reverse_complement(w)
             in_sequence = False
@@ -30,7 +30,6 @@ def is_maw(x: str, sequences: set[str]):
                     break
             if not in_sequence:
                 return False
-    
     return True
 
 def increment_lexicographic(array: list[int], base: int):
