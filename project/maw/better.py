@@ -1,7 +1,4 @@
 from maw.utils import ALPHABET, to_canonical, reverse_complement
-from typing import Collection
-from functools import lru_cache
-
 
 def k_substrings(seq: str, k: int) -> set[str]:
     """Returns the substrings of length k in the given sequence."""
@@ -41,17 +38,17 @@ def extended_strings(seq: str) -> set[str]:
         exts.add(seq + a)
     return exts
 
-def all_maws_candidates_of_sequence(seq: str, k: int) -> set[str]:
+def all_maws_candidates(seq: str, k: int) -> set[str]:
     """Returns all possible absent words candidates of length 3 up to k"""
     candidates = set()
     for w in add_reverse_complements(all_substrings(seq, 2, k-1)):
         candidates.update(extended_strings(w))
     return candidates
 
-def maws(sequences: Collection[str], k: int):
+def get_all_maws(sequences: set[str], kmax: int) -> set[str]:
     maws = set()
     for seq in sequences:
-        for x in all_maws_candidates_of_sequence(seq, k):
+        for x in all_maws_candidates(seq, kmax):
             rx = reverse_complement(x)
             pres = get_proper_prefixes(x)
             sufs = get_proper_suffixes(x)
@@ -68,4 +65,11 @@ def maws(sequences: Collection[str], k: int):
                     valide_candiate = False
             if valide_candiate:
                 maws.add(to_canonical(x))
+    return maws
+
+def find_maws(sequences: set[str], kmax: int) -> dict[int, set[str]]:
+    maws_set = get_all_maws(sequences, kmax)
+    maws = {k: set() for k in range(3, kmax+1)}
+    for maw in maws_set:
+        maws[len(maw)].add(maw)
     return maws
