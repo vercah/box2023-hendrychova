@@ -17,6 +17,7 @@ try:
     max_seqs = int(sys.argv[3])
     seqs = set(list(seqs)[:max_seqs])
 except:
+    max_seqs = len(seqs)
     pass
 
 
