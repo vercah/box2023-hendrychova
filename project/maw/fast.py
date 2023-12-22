@@ -98,34 +98,24 @@ def find_maws(sequences: set[str], kmax: int) -> dict[int, set[str]]:
     
     rev = reverse_complement
 
-    substrings = set()
-    kmax_subs = set()
-    for seq in seqs:
+    subs = {k: set() for k in range(2, kmax+1)}
+    for s, seq in enumerate(seqs):
+        # print(f"Gathering substrings of sequence {s}")
         for i, l in seq.substrings(2, kmax):
-            if l == kmax:
-                kmax_subs.add(seq[i:i+l])
-            else:
-                substrings.add(seq[i:i+l])
+            subs[l].add(seq[i:i+l])
     
-    for sub in substrings:
-        if len(sub) == kmax:
-            continue
-        for a in ALPHABET:
-            cand = a + sub
-            w = cand[:-1]
-            valid = w in substrings or rev(w) in substrings
-            if valid and \
-                cand not in substrings and rev(cand) not in substrings and \
-                cand not in kmax_subs and rev(cand) not in kmax_subs:
-                maws[len(cand)].add(to_canonical(cand))
+    for k in range(2, kmax):
+        for sub in subs[k]:
+            for a in ALPHABET:
+                cand = a + sub
+                w = cand[:-1]
+                if (w in subs[k] or rev(w) in subs[k]) and \
+                    cand not in subs[k+1] and rev(cand) not in subs[k+1]:
+                    maws[k+1].add(to_canonical(cand))
 
-
-            cand = sub + a
-            w = cand[1:]
-            valid = w in substrings or rev(w) in substrings
-            if valid and \
-                cand not in substrings and rev(cand) not in substrings and \
-                cand not in kmax_subs and rev(cand) not in kmax_subs:
-                maws[len(cand)].add(to_canonical(cand))
-          
+                cand = sub + a
+                w = cand[1:]
+                if (w in subs[k] or rev(w) in subs[k]) and \
+                    cand not in subs[k+1] and rev(cand) not in subs[k+1]:
+                    maws[k+1].add(to_canonical(cand))
     return maws
