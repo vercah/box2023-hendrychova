@@ -1,7 +1,7 @@
 # Minimal Absent Words
 
 This project implements several algorithms to experiment with he extraction
-of minimal absent words (MAW) from a set of sequences provided in a FASAT file.
+of minimal absent words (MAW) from a set of sequences provided in a FASTA file.
 
 ## Install
 
