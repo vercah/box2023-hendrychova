@@ -8,13 +8,18 @@ import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(prog="Minimal Absent Words")
-    parser.add_argument("-f", "--file", required=True, type=str)
+    parser = argparse.ArgumentParser(prog="maw")
+    parser.add_argument("-f", "--file", required=True, type=str,
+                        help="Source FASTA file, can be compressed.")
     parser.add_argument("-k", "--kmax", type=int, required=True)
-    parser.add_argument("-a", "--algo", choices=["naive", "string-ext", "fast-string-ext"], default="fast-string-ext")
-    parser.add_argument("-p", "--print", action="store_true")
-    parser.add_argument("-t", "--tsv", default="", type=str)
-    parser.add_argument("-s", "--sample", type=int, default=0)
+    parser.add_argument("-a", "--algo", choices=["naive", "string-ext", "fast-string-ext"], default="fast-string-ext",
+                        help="What algorithm to use")
+    parser.add_argument("-p", "--print", action="store_true",
+                        help="Set if you want to display the result in the console as well.")
+    parser.add_argument("-t", "--tsv", default="", type=str,
+                        help="Name of the output TSV file.")
+    parser.add_argument("-s", "--sample", type=int, default=0,
+                        help="Compute on a subset of the given size of the whole sequences set.")
 
     args = parser.parse_args()
 
