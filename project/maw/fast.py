@@ -5,6 +5,25 @@ from maw.utils import reverse_complement
 from maw.utils import to_canonical
 
 
+def build_lcp(s: str, sa: list[int]):
+    n = len(s)
+    rank = [0] * n
+    for i in range(n):
+        rank[sa[i]] = i
+    k = 0
+    lcp = [0] * (n-1)
+    for i in range(n):
+        if rank[i] == n - 1:
+            k = 0
+            continue
+        j = sa[rank[i] + 1]
+        while i + k < n and j + k < n and s[i+k] == s[j+k]:
+            k += 1
+        lcp[rank[i]] = k
+        if k != 0:
+            k -= 1
+    return lcp
+
 class Sequence:
     def __init__(self, seq: str) -> None:
         self._seq = seq
@@ -18,6 +37,7 @@ class Sequence:
                 self.first_occ[a] = i
             if b not in self.last_occ:
                 self.last_occ[b] = j
+        self.lcp = build_lcp(seq, self.sa)
     
     def __str__(self) -> str:
         return self._seq
@@ -45,29 +65,22 @@ class Sequence:
     
     def __getitem__(self, slice) -> str:
         return self._seq[slice]
-
-
-def k_substrings(seq: Sequence, k: int) -> set[str]:
-    """Returns the substrings of length k in the given sequence."""
-    subs = set()
-    for i in range(len(seq)-k+1):
-        subs.add(seq[i:i+k])
-    return subs
-
-def all_substrings(seq: Sequence, mini: int, maxi: int) -> set[str]:
-    """Returns all substring of seq of length in range [mini, maxi]."""
-    subs = set()
-    for k in range(mini, maxi+1):
-        subs.update(k_substrings(seq, k))
-    return subs
-
-def add_reverse_complements(strs: set[str]) -> set[str]:
-    """Adds to a given set of strings with their reverse complements."""
-    new_strs = set()
-    for s in strs:
-        new_strs.add(s)
-        new_strs.add(reverse_complement(s))
-    return new_strs
+    
+    def substrings(self, mini: int, maxi: int):
+        sa = self.sa
+        n = len(sa)
+        suf_len = [n - sa[i] for i in range(n)]
+        i = 0
+        while i < n:
+            if suf_len[i] < mini:
+                i += 1
+                continue
+            start_len = mini
+            if i > 0:
+                start_len = max(start_len, self.lcp[i-1])
+            for l in range(start_len, min(suf_len[i], maxi)+1):
+                yield sa[i], l
+            i += 1
 
 def find_maws(sequences: set[str], kmax: int) -> dict[int, set[str]]:
     """Returns all minimum absent words (MAWs) of length 3 to kmax of the set
@@ -86,38 +99,33 @@ def find_maws(sequences: set[str], kmax: int) -> dict[int, set[str]]:
     rev = reverse_complement
 
     substrings = set()
+    kmax_subs = set()
     for seq in seqs:
-        substrings.update(add_reverse_complements(all_substrings(seq, 2, kmax-1)))
+        for i, l in seq.substrings(2, kmax):
+            if l == kmax:
+                kmax_subs.add(seq[i:i+l])
+            else:
+                substrings.add(seq[i:i+l])
     
     for sub in substrings:
+        if len(sub) == kmax:
+            continue
         for a in ALPHABET:
             cand = a + sub
-            valid = False
-            for seq in seqs:
-                w = cand[:-1] 
-                if w in substrings or rev(w) in substrings:
-                    valid = True
-                    break
-            if valid:
-                for seq in seqs:
-                    if cand in seq or rev(cand) in seq:
-                        break
-                else:
-                    maws[len(cand)].add(to_canonical(cand))
+            w = cand[:-1]
+            valid = w in substrings or rev(w) in substrings
+            if valid and \
+                cand not in substrings and rev(cand) not in substrings and \
+                cand not in kmax_subs and rev(cand) not in kmax_subs:
+                maws[len(cand)].add(to_canonical(cand))
 
 
             cand = sub + a
-            valid = False
-            for seq in seqs:
-                w = cand[1:] 
-                if w in substrings or rev(w) in substrings:
-                    valid = True
-                    break
-            if valid:
-                for seq in seqs:
-                    if cand in seq or rev(cand) in seq:
-                        break
-                else:
-                    maws[len(cand)].add(to_canonical(cand))
+            w = cand[1:]
+            valid = w in substrings or rev(w) in substrings
+            if valid and \
+                cand not in substrings and rev(cand) not in substrings and \
+                cand not in kmax_subs and rev(cand) not in kmax_subs:
+                maws[len(cand)].add(to_canonical(cand))
           
     return maws
