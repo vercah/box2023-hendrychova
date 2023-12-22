@@ -108,14 +108,14 @@ def find_maws(sequences: set[str], kmax: int) -> dict[int, set[str]]:
         for sub in subs[k]:
             for a in ALPHABET:
                 cand = a + sub
-                w = cand[:-1]
-                if (w in subs[k] or rev(w) in subs[k]) and \
-                    cand not in subs[k+1] and rev(cand) not in subs[k+1]:
-                    maws[k+1].add(to_canonical(cand))
+                if cand not in subs[k+1] and rev(cand) not in subs[k+1]:
+                    w = cand[:-1]
+                    if w in subs[k] or rev(w) in subs[k]:
+                        maws[k+1].add(to_canonical(cand))
 
                 cand = sub + a
-                w = cand[1:]
-                if (w in subs[k] or rev(w) in subs[k]) and \
-                    cand not in subs[k+1] and rev(cand) not in subs[k+1]:
-                    maws[k+1].add(to_canonical(cand))
+                if cand not in subs[k+1] and rev(cand) not in subs[k+1]:
+                    w = cand[1:]
+                    if w in subs[k] or rev(w) in subs[k]:
+                        maws[k+1].add(to_canonical(cand))
     return maws
