@@ -61,27 +61,26 @@ def right_maw_candidates(seq: str, k: int) -> set[str]:
 
 def get_all_maws(sequences: set[str], kmax: int) -> set[str]:
     maws = set()
-    pres = set()
-    sufs = set()
     for seq in sequences:
         left_candidates = left_maw_candidates(seq, kmax)
         right_candidates = right_maw_candidates(seq, kmax)
         all_candidates = left_candidates.union(right_candidates)
-        for x in all_candidates:
+        for x in sorted(all_candidates):
             if x in left_candidates:
-                subs = get_proper_prefixes(x)
+                necessary = x[0:len(x)-1]
             if x in right_candidates:
-                subs = get_proper_suffixes(x)
-            valide_candiate = True
-            for sub in subs:
-                for other_seq in sequences:
-                    if sub not in other_seq and reverse_complement(sub) not in other_seq:
-                        valide_candiate = False
+                necessary = x[1:len(x)]
+            valide_candiate = False
+            for other_seq in sequences:
+                if necessary in other_seq or reverse_complement(necessary) in other_seq:
+                    valide_candiate = True
+                    break
             if not valide_candiate:
                 continue
             for other_seq in sequences:
                 if x in other_seq or reverse_complement(x) in other_seq:
                     valide_candiate = False
+                    break
             if valide_candiate:
                 maws.add(to_canonical(x))
     return maws

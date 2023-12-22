@@ -40,3 +40,5 @@ def test_left_maw_candidates():
 def test_get_all_maws():
     assert get_all_maws({"AACTACT"}, 3) == {"AAA", "TAA", "AAG"}
     assert get_all_maws({"AAA"}, 3) == set()
+    assert get_all_maws({"AAT", "ATT"}, 3) == {"AAA"}
+    assert get_all_maws({"AACCGA", "AGGACC", "CACCATTT"}, 4) == {'AAG', 'CCC', 'TCA', 'ACA', 'AGA', 'CAG', 'ACG', 'CTC', 'ATC', 'GAA', 'ACT', 'CAA', 'AAAA', 'CCAC', 'CCGG', 'AATT', 'TCCA', 'AAAC', 'CATG', 'CGGA', 'TCGA', 'CGAC', 'ACCT'}
