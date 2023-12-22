@@ -3,7 +3,6 @@ from maw.karkkainen_sanders import simple_kark_sort
 from maw.utils import ALPHABET
 from maw.utils import reverse_complement
 from maw.utils import to_canonical
-from functools import cached_property
 
 
 class Sequence:
