@@ -79,6 +79,8 @@ class Sequence:
     
     def __contains__(self, sub: str) -> bool:
         # return sub in self.seq
+        if sub[0] not in self.first_occ:
+            return False
         a = self.first_occ[sub[0]]
         b = self.last_occ[sub[0]]
         while a <= b:

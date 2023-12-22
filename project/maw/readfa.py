@@ -1,5 +1,9 @@
 #! /usr/bin/env python3
 
+from maw.utils import ALPHABET
+import re
+from xopen import xopen
+
 
 def readfq(fp):  # this is a generator function
     # From https://github.com/lh3/readfq/blob/master/readfq.py
@@ -33,4 +37,13 @@ def readfq(fp):  # this is a generator function
             if last:  # reach EOF before reading enough quality
                 yield name, seq, None  # yield a fasta record instead
                 break
+
+
+def read_fa_sequences(file_name: str) -> set[str]:
+    sequences = set()
+    for _, seq, _ in readfq(xopen(file_name)):
+        subseqs = filter(lambda s: len(s) > 0, re.split(f"[^{ALPHABET}]", seq))
+        subseqs = list(subseqs)
+        sequences.update(subseqs)
+    return sequences
 

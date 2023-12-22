@@ -1,6 +1,6 @@
 import time
 import sys
-from maw.maw import read_fa_sequences
+from maw.readfa import read_fa_sequences
 import maw.naive as naive
 import maw.better as better
 import maw.fast as fast
@@ -8,10 +8,20 @@ from maw.fmt import pprint, to_tsv
 import matplotlib.pyplot as plt
 
 
-seqs = read_fa_sequences(sys.argv[1])
-seqs = set(seqs.values())
+filename = sys.argv[1]
+print(f"Loading {filename}")
+seqs = read_fa_sequences(filename)
 max_kmax = int(sys.argv[2])
 kmax_vals = list(range(3, max_kmax+1))
+
+try:
+    max_seqs = int(sys.argv[3])
+    seqs = set(list(seqs)[:max_seqs])
+except:
+    pass
+
+
+print(f"{len(seqs)} sequences")
 
 time_data = {}
 def benchmark(find_maws_fn, name):
@@ -36,8 +46,8 @@ for name, durations in time_data.items():
     plt.plot(kmax_vals, durations, label=name, marker='o')
 plt.xlabel('K max')
 plt.ylabel('Elapsed Time (seconds)')
-plt.title('Execution time for different kmax values')
+plt.title(f'Execution times for {filename}, {len(seqs)} sequences')
 plt.yscale("log")
 plt.legend()
-plt.savefig('benchmark.png')
+plt.savefig(f'benchmark-{filename.split(".")[0]}-k{max_kmax}.png')
 plt.show()
