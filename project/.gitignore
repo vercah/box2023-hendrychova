@@ -4,3 +4,5 @@ __pycache__
 *.fa.xz
 *.fa
 *.png
+*.egg-info
+build
