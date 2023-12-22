@@ -22,7 +22,6 @@ def add_reverse_complements(seqs: set[str]) -> set[str]:
         new_seqs.add(reverse_complement(seq))
     return new_seqs
 
-
 def get_proper_prefixes(seq: str) -> set[str]:
     return set(seq[:i] for i in range(1,len(seq)))
 
