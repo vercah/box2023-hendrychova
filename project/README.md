@@ -40,3 +40,34 @@ options:
   -s SAMPLE, --sample SAMPLE
                         Compute on a subset of the given size of the whole sequences set.
 ```
+
+## Testing
+
+### Unit tests
+
+Unittests require `pytest` (installed with the requirements). Run all
+the tests with:
+
+```bash
+python -m pytest tests
+```
+
+### Benchmarks
+
+The `benchmark.py` script allows you to compare the different algorithms on a given dataset.
+
+Use it as follows:
+
+```bash
+python benchmark.py FILE MAX_KMAX [SAMPLES]
+```
+
+where
+
+- `FILE` is the path to the FASTA file to run the benchmark on;
+- `MAX_KMAX` reprsents the last `kmax` value for which the algorithms will be run. The
+script measures the execution time for all `kmax` between `3` and `MAX_KMAX`;
+- `SAMPLES` (optional) specify the number of sequences to consider from the FASTA file
+for the benchmark. If not set, all the sequences are considered.
+
+At the end of the benchmark, a plot will be displayed and saved into a PNG.
