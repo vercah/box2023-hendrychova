@@ -8,6 +8,9 @@ from maw.better import extended_right
 from maw.better import extended_left
 from maw.better import get_all_maws
 from maw.better import left_maw_candidates
+import maw.naive as naive
+import maw.better as better
+
 
 def test_k_substrings():
     assert k_substrings("AACTGG", 2) == {"AA", "AC", "CT", "TG", "GG"}
@@ -38,7 +41,22 @@ def test_left_maw_candidates():
     assert left_maw_candidates("AAC",3) == {"AAA", "CAA", "GAA", "TAA", "AAC", "CAC", "GAC", "TAC", "ATT", "CTT", "GTT", "TTT", "AGT", "CGT", "GGT", "TGT"}
 
 def test_get_all_maws():
-    assert get_all_maws({"AACTACT"}, 3) == {"AAA", "TAA", "AAG"}
-    assert get_all_maws({"AAA"}, 3) == set()
-    assert get_all_maws({"AAT", "ATT"}, 3) == {"AAA"}
-    assert get_all_maws({"AACCGA", "AGGACC", "CACCATTT"}, 4) == {'AAG', 'CCC', 'TCA', 'ACA', 'AGA', 'CAG', 'ACG', 'CTC', 'ATC', 'GAA', 'ACT', 'CAA', 'AAAA', 'CCAC', 'CCGG', 'AATT', 'TCCA', 'AAAC', 'CATG', 'CGGA', 'TCGA', 'CGAC', 'ACCT'}
+    assert better.get_all_maws({"AACTACT"}, 3) == {"AAA", "TAA", "AAG"}
+    assert better.get_all_maws({"AAA"}, 3) == set()
+    assert better.get_all_maws({"AAT", "ATT"}, 3) == {"AAA"}
+    assert better.get_all_maws({"AACCGA", "AGGACC", "CACCATTT"}, 4) == {'AAG', 'CCC', 'TCA', 'ACA', 'AGA', 'CAG', 'ACG', 'CTC', 'ATC', 'GAA', 'ACT', 'CAA', 'AAAA', 'CCAC', 'CCGG', 'AATT', 'TCCA', 'AAAC', 'CATG', 'CGGA', 'TCGA', 'CGAC', 'ACCT'}
+
+def test_better_correct():
+    # one "large" sequence
+    seqs = {
+        "GGTCTCTCTGGTTAGACCAGATCTGAGCCTGGGAGCTCTCTGGCTAACTAGGGAACCCACTGCTTAAGCC"
+        "TCAATAAAGCTTGCCTTGAGTGCTTCAAGTAGTGTGTGCCCGTCTGTTGTGTGACTCTGGTAACTAGAGA"
+        "TCCCTCAGACCCTTTTAGTCAGTGTGGAAAATCTCTAGCAGTGGCGCCCGAACAGGGACCTGAAAGCGAA"
+        "AGGGAAACCAGAGGAGCTCTCTCGACGCAGGACTCGGCTTGCTGAAGCGCGCACGGCAAGAGGCGAGGGG"
+        "CGGCGACTGGTGAGTACGCCAAAAATTTTGACTAGCGGAGGCTAGAAGGAGAGAGATGGGTGCGAGAGCG"
+        "TCAGTATTAAGCGGGGGAGAATTAGATCGATGGGAAAAAATTCGGTTAAGGCCAGGGGGAAAGAAAAAAT"
+        "ATAAATTAAAACATATAGTATGGGCAAGCAGGGAGCTAGAACGATTCGCAGTTAATCCTGGCCTGTTAGA"
+    }
+    assert better.find_maws(seqs, 3) == naive.find_maws(seqs, 3)
+    assert better.find_maws(seqs, 4) == naive.find_maws(seqs, 4)
+    assert better.find_maws(seqs, 5) == naive.find_maws(seqs, 5)
