@@ -5,57 +5,6 @@ from maw.utils import reverse_complement
 from maw.utils import to_canonical
 from functools import cached_property
 
-# class View:
-#     def __init__(self, seq: str, i: int, j: int) -> None:
-#         if i < 0 or i >= len(seq) or j < 0 or j > len(seq):
-#             raise IndexError("Index out of range.")
-#         if i > j:
-#             raise ValueError("Invalid view range.")
-#         self.seq = seq
-#         self.i = i
-#         self.j = j
-    
-#     def __str__(self):
-#         return self.seq[self.i:self.j]
-
-#     def __getitem__(self, i: int) -> str:
-#         k = self.i + i
-#         if k < self.i or k >= self.j:
-#             raise IndexError("Index out of range.")
-#         return self.seq[self.i + i]
-    
-#     def __len__(self) -> int:
-#         return self.j - self.i
-    
-#     def view(self, i: int, j: int) -> View:
-#         i1 = self.i + i
-#         j1 = self.i + j
-#         if i1 < self.i or i1 >= self.j or \
-#             j1 < self.j or j1 >= self.j:
-#             raise IndexError("Index out of range.")
-#         return View(self.seq, i1, j1)
-    
-#     def startswith(self, sub: str) -> bool:
-#         if len(sub) > len(self):
-#             return False
-#         for k in range(len(sub)):
-#             if self.seq[self.i + k] != sub[k]:
-#                 return False
-#         return True
-    
-#     def compare_with(self, other: str) -> int:
-#         for k in range(min(len(other), len(self))):
-#             if self.seq[self.i + k] < other[k]:
-#                 return -1
-#             elif self.seq[self.i + k] > other[k]:
-#                 return 1
-#         if len(self) < len(other):
-#             return -1
-#         elif len(self) > len(other):
-#             return 1
-#         else:
-#             return 0
-
 
 class Sequence:
     def __init__(self, seq: str) -> None:
@@ -99,36 +48,27 @@ class Sequence:
         return self._seq[slice]
 
 
-def k_maws_of_seq(s: Sequence, k: int) -> set[str]:
-    k_maws = set()
-    tested = set()
-    rev = reverse_complement
+def k_substrings(seq: Sequence, k: int) -> set[str]:
+    """Returns the substrings of length k in the given sequence."""
+    subs = set()
+    for i in range(len(seq)-k+1):
+        subs.add(seq[i:i+k])
+    return subs
 
-    for i in range(0, len(s)-(k-2)+1):
-        w0 = s[i:i+(k-2)]
-        if w0 in tested:
-            continue
-        tested.add(w0)
-        
-        for a in ALPHABET:
-            wl = a + w0
-            if wl not in s and rev(wl) not in s:
-                continue
+def all_substrings(seq: Sequence, mini: int, maxi: int) -> set[str]:
+    """Returns all substring of seq of length in range [mini, maxi]."""
+    subs = set()
+    for k in range(mini, maxi+1):
+        subs.update(k_substrings(seq, k))
+    return subs
 
-            for b in ALPHABET:
-                wr = w0 + b
-                if wr not in s and rev(wr) not in s:
-                    continue
-                
-                fx = a + w0 + b
-                rx = rev(fx)
-                if fx in s or rx in s:
-                    continue
-                k_maws.add(fx)
-                k_maws.add(rx)
-    
-    return k_maws
-
+def add_reverse_complements(strs: set[str]) -> set[str]:
+    """Adds to a given set of strings with their reverse complements."""
+    new_strs = set()
+    for s in strs:
+        new_strs.add(s)
+        new_strs.add(reverse_complement(s))
+    return new_strs
 
 def find_maws(sequences: set[str], kmax: int) -> dict[int, set[str]]:
     """Returns all minimum absent words (MAWs) of length 3 to kmax of the set
@@ -139,21 +79,46 @@ def find_maws(sequences: set[str], kmax: int) -> dict[int, set[str]]:
     """
     maws = {k: set() for k in range(3, kmax+1)}
 
-    seqs = []
+    seqs: list[Sequence] = []
     for i, s in enumerate(sequences):
         # print(f"Initializing sequence {i}")
         seqs.append(Sequence(s))
-    # seqs = set(map(Sequence, sequences))
-    for k in maws.keys():
-        for i, seq in enumerate(seqs):
-            # print(f"Finding {k}-MAWs of sequence {i}")
-            for maw in k_maws_of_seq(seq, k):
-                add = True
-                for other in seqs:
-                    if maw in other:
-                        add = False
+    
+    rev = reverse_complement
+
+    substrings = set()
+    for seq in seqs:
+        substrings.update(add_reverse_complements(all_substrings(seq, 2, kmax-1)))
+    
+    for sub in substrings:
+        for a in ALPHABET:
+            cand = a + sub
+            valid = False
+            for seq in seqs:
+                w = cand[:-1] 
+                if w in substrings or rev(w) in substrings:
+                    valid = True
+                    break
+            if valid:
+                for seq in seqs:
+                    if cand in seq or rev(cand) in seq:
                         break
-                if add:
-                    maws[k].add(to_canonical(maw))
-                
+                else:
+                    maws[len(cand)].add(to_canonical(cand))
+
+
+            cand = sub + a
+            valid = False
+            for seq in seqs:
+                w = cand[1:] 
+                if w in substrings or rev(w) in substrings:
+                    valid = True
+                    break
+            if valid:
+                for seq in seqs:
+                    if cand in seq or rev(cand) in seq:
+                        break
+                else:
+                    maws[len(cand)].add(to_canonical(cand))
+          
     return maws
